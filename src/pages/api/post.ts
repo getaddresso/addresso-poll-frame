@@ -44,10 +44,10 @@ export default async function handler(
 
   if (textInput && textInput.length > 0) {
     // show mint btn
-    html = generateFarcasterFrame(`${BASE_URL}/mint.webp`, true)
+    html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
   } else {
     // show default
-    html = generateFarcasterFrame(`${BASE_URL}/question.webp`, false)
+    html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
   }
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
