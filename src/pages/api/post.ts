@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse, Metadata } from 'next'
 
 import { BASE_URL, generateFarcasterFrame } from '@/utils'
 import { validateMessage } from '@/validate'
@@ -19,6 +19,7 @@ export default async function handler(
       messageHash: string
       timestamp: number
       network: number
+      inputText: string
       buttonIndex: number
       castId: { fid: number; hash: string }
     }
@@ -31,18 +32,22 @@ export default async function handler(
     signedMessage.trustedData?.messageBytes
   )
 
+  console.log('signedMessage', signedMessage)
+
   if (!isMessageValid) {
     return res.status(400).json({ error: 'Invalid message' })
   }
 
-  const choice = signedMessage.untrustedData.buttonIndex
+  const textInput = signedMessage.untrustedData.inputText
 
   let html: string = ''
 
-  if (choice === 1) {
-    html = generateFarcasterFrame(`${BASE_URL}/happy.jpg`, choice)
+  if (textInput && textInput.length > 0) {
+    // show mint btn
+    html = generateFarcasterFrame(`${BASE_URL}/mint.webp`, true)
   } else {
-    html = generateFarcasterFrame(`${BASE_URL}/threat.jpg`, choice)
+    // show default
+    html = generateFarcasterFrame(`${BASE_URL}/question.webp`, false)
   }
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
