@@ -11,7 +11,10 @@ export default function Home() {
         <meta property="fc:frame:image" content={`${BASE_URL}/question.svg`} />
         <meta property="fc:frame:input:text" content="Type something here..." />
         <meta property="fc:frame:button:1" content="Submit" />
-        <meta property="fc:frame:post_url" content={`${BASE_URL}/api/post`} />
+        <meta
+          property="fc:frame:post_url"
+          content={`${BASE_URL}/api/post?data=1`}
+        />
       </Head>
     </>
   )

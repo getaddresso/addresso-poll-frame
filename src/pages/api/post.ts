@@ -29,6 +29,8 @@ export default async function handler(
     }
   }
 
+  const reqId = req.query.data
+
   const isMessageValid = await validateMessage(
     signedMessage.trustedData?.messageBytes
   )
@@ -45,8 +47,8 @@ export default async function handler(
 
   let html: string = ''
 
-  switch (buttonId) {
-    case 1:
+  switch (reqId) {
+    case '1':
       if (textInput && textInput.length > 0) {
         const existingFeedback =
           await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
@@ -57,16 +59,13 @@ export default async function handler(
           html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
         } else {
           await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
+          html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
         }
-        // show mint btn
-        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
       } else {
-        // show default
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       }
       break
-    case 2:
-      // do the mint
+    case '2':
       if (signedMessage.trustedData?.messageBytes) {
         await mintWithSyndicate(signedMessage.trustedData.messageBytes)
       }
