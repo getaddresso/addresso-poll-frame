@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse, Metadata } from 'next'
 
-import { BASE_URL, generateFarcasterFrame } from '@/utils'
+import { BASE_URL, generateFarcasterFrame, mintWithSyndicate } from '@/utils'
 import { validateMessage } from '@/validate'
 
 export default async function handler(
@@ -45,7 +45,9 @@ console
 
   let html: string = ''
 
-  switch (buttonId) {
+
+
+ switch (buttonId) {
     case 1:
       if (textInput && textInput.length > 0) {
         // show mint btn
@@ -57,8 +59,12 @@ console
 
     case 2:
       // do the mint
+      if(signedMessage.trustedData?.messageBytes){
+        await mintWithSyndicate(signedMessage.trustedData.messageBytes)
+      }
+     
     
-  }
+  } 
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
 }
