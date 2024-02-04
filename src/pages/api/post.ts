@@ -7,11 +7,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log('Getting here! ooo')
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' })
     return
   }
-
+console
   const signedMessage = req.body as {
     untrustedData: {
       fid: number
@@ -27,6 +28,7 @@ export default async function handler(
       messageBytes: string
     }
   }
+  console.log(signedMessage, 'signed msg?')
 
   const isMessageValid = await validateMessage(
     signedMessage.trustedData?.messageBytes
@@ -39,15 +41,23 @@ export default async function handler(
   }
 
   const textInput = signedMessage.untrustedData.inputText
+  const buttonId = signedMessage.untrustedData.buttonIndex
 
   let html: string = ''
 
-  if (textInput && textInput.length > 0) {
-    // show mint btn
-    html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
-  } else {
-    // show default
-    html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+  switch (buttonId) {
+    case 1:
+      if (textInput && textInput.length > 0) {
+        // show mint btn
+        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+      } else {
+        // show default
+        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+      }
+
+    case 2:
+      // do the mint
+    
   }
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
