@@ -47,24 +47,25 @@ console
 
 
 
- switch (buttonId) {
+  switch (buttonId) {
     case 1:
       if (textInput && textInput.length > 0) {
         // show mint btn
-        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true);
       } else {
         // show default
-        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false);
       }
-
+      break; 
+  
     case 2:
       // do the mint
-      if(signedMessage.trustedData?.messageBytes){
-        await mintWithSyndicate(signedMessage.trustedData.messageBytes)
+      if (signedMessage.trustedData?.messageBytes) {
+        await mintWithSyndicate(signedMessage.trustedData.messageBytes);
       }
-     
-    
-  } 
+      break;
+  }
+  
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
 }
