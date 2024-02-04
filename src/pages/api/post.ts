@@ -8,12 +8,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log('Getting here! ooo')
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method Not Allowed' })
     return
   }
-  console
+
   const signedMessage = req.body as {
     untrustedData: {
       fid: number
@@ -29,7 +28,6 @@ export default async function handler(
       messageBytes: string
     }
   }
-  console.log(signedMessage, 'signed msg?')
 
   const isMessageValid = await validateMessage(
     signedMessage.trustedData?.messageBytes
@@ -50,15 +48,15 @@ export default async function handler(
   switch (buttonId) {
     case 1:
       if (textInput && textInput.length > 0) {
-        const existingFeedback = await sql`
-        SELECT * FROM Feedback WHERE Fid = ${ud.fid}
-    `
+        const existingFeedback =
+          await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
         console.log('existingFeedback', existingFeedback)
 
-        if (existingFeedback) {
+        if (existingFeedback.rowCount > 0) {
           console.log('Feedback already submitted by fid:', ud.fid)
+          html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
         } else {
-          await sql`INSERT INTO Feedback (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
+          await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
         }
         // show mint btn
         html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
@@ -66,12 +64,16 @@ export default async function handler(
         // show default
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       }
-
+      break
     case 2:
       // do the mint
       if (signedMessage.trustedData?.messageBytes) {
         await mintWithSyndicate(signedMessage.trustedData.messageBytes)
       }
+      break
+    default:
+      html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+      break
   }
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)

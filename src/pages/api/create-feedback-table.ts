@@ -6,7 +6,7 @@ export default async function handler(
   response: NextApiResponse
 ) {
   try {
-    const result = await sql`CREATE TABLE IF NOT EXISTS Feedback ( 
+    const result = await sql`CREATE TABLE IF NOT EXISTS "Feedback" ( 
 		Id SERIAL PRIMARY KEY,
 		Fid BIGINT NOT NULL, 
 		Text VARCHAR(255) NOT NULL,
