@@ -50,17 +50,19 @@ export default async function handler(
   switch (reqId) {
     case '1':
       if (textInput && textInput.length > 0) {
-        const existingFeedback =
-          await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
-        console.log('existingFeedback', existingFeedback)
+        // const existingFeedback =
+        //   await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
+        // console.log('existingFeedback', existingFeedback)
 
-        if (existingFeedback.rowCount > 0) {
-          console.log('Feedback already submitted by fid:', ud.fid)
-          html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
-        } else {
-          await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
-          html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
-        }
+        // if (existingFeedback.rowCount > 0) {
+        //   console.log('Feedback already submitted by fid:', ud.fid)
+        //   html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+        // } else {
+        //   await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
+        //   html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+        // }
+		
+		html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
       } else {
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       }
