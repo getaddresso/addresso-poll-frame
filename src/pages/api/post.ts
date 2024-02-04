@@ -30,6 +30,7 @@ export default async function handler(
   }
 
   const reqId = req.query.data
+  console.log(reqId, 'wats reqid??')
 
   const isMessageValid = await validateMessage(
     signedMessage.trustedData?.messageBytes
@@ -50,17 +51,17 @@ export default async function handler(
   switch (reqId) {
     case '1':
       if (textInput && textInput.length > 0) {
-        const existingFeedback =
+         /* const existingFeedback =
           await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
         console.log('existingFeedback', existingFeedback)
-
-        if (existingFeedback.rowCount > 0) {
+       if (existingFeedback.rowCount > 0) {
           console.log('Feedback already submitted by fid:', ud.fid)
           html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
         } else {
-          await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
+         // await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
           html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
-        }
+        } */
+        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
       } else {
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       }
@@ -74,6 +75,8 @@ export default async function handler(
       html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       break
   }
+
+  console.log(html, 'wats html?')
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
 }
