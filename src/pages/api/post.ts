@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse, Metadata } from 'next'
+import { sql } from '@vercel/postgres'
 
 import { BASE_URL, generateFarcasterFrame } from '@/utils'
 import { validateMessage } from '@/validate'
@@ -38,11 +39,23 @@ export default async function handler(
     return res.status(400).json({ error: 'Invalid message' })
   }
 
+  const ud = signedMessage.untrustedData
   const textInput = signedMessage.untrustedData.inputText
 
   let html: string = ''
 
   if (textInput && textInput.length > 0) {
+    const existingFeedback = await sql`
+        SELECT * FROM Feedback WHERE Fid = ${ud.fid}
+    `
+    console.log('existingFeedback', existingFeedback)
+
+    if (existingFeedback) {
+      console.log('Feedback already submitted by fid:', ud.fid)
+    } else {
+      await sql`INSERT INTO Feedback (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
+    }
+
     // show mint btn
     html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
   } else {
