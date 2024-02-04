@@ -43,13 +43,12 @@ export default async function handler(
   }
 
   const ud = signedMessage.untrustedData
-  const textInput = signedMessage.untrustedData.inputText
-  const buttonId = signedMessage.untrustedData.buttonIndex
+  const textInput = ud.inputText
 
   let html: string = ''
 
   switch (reqId) {
-    case '1':
+    case 'start':
       if (textInput && textInput.length > 0) {
         // const existingFeedback =
         //   await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
@@ -68,10 +67,8 @@ export default async function handler(
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       }
       break
-    case '2':
-      if (signedMessage.trustedData?.messageBytes) {
-        await mintWithSyndicate(signedMessage.trustedData.messageBytes)
-      }
+    case 'mint':
+      await mintWithSyndicate(ud.fid)
       break
     default:
       html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)

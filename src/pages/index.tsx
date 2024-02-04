@@ -13,7 +13,7 @@ export default function Home() {
         <meta property="fc:frame:button:1" content="Submit" />
         <meta
           property="fc:frame:post_url"
-          content={`${BASE_URL}/api/post?data=1`}
+          content={`${BASE_URL}/api/post?data=start`}
         />
       </Head>
     </>

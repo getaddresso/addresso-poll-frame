@@ -1,3 +1,5 @@
+import { syndicate } from './config'
+
 export const BASE_URL = process.env.BASE_URL
 
 // generate an html page with the relevant opengraph tags
@@ -13,7 +15,7 @@ export function generateFarcasterFrame(image: string, isMint?: boolean) {
          <meta property="fc:frame:button:1" content="Mint (34 remaining)" />`
     }
       <meta property="fc:frame:post_url" content="${BASE_URL}/api/post?data=${
-    isMint ? 2 : 1
+    isMint ? 'mint' : 'start'
   }" />
     </head>
     <body>
@@ -23,38 +25,46 @@ export function generateFarcasterFrame(image: string, isMint?: boolean) {
   `
 }
 
-export async function mintWithSyndicate(trustedMessageBytes: string) {
-  const tokenContract = '0x13C3189CAAC7792D10C75965C1DeFC7b0e7A5458'
-  const syndicateRegisterResult = await fetch(
-    'https://frame.syndicate.io/api/register',
-    {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${process.env.SYNDICATE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        contractAddress: tokenContract,
-        functionSignature: 'mint(address,uint256)',
-      }),
-    }
-  )
-  //console.log(syndicateRegisterResult, 'syndicate registration result')
+export async function mintWithSyndicate(fid: number) {
+  const syndicateMintTx = await syndicate.transact.sendTransaction({
+    projectId: 'b344b207-4add-4dbe-bc55-3e4487c0dadc',
+    contractAddress: '0x930A544c651c8a137B60C0505415f3900CC143fc',
+    chainId: 84532,
+    functionSignature: 'mint(address to)',
+    args: {
+      to: getAddrByFid(fid),
+    },
+  })
+  console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)
+}
 
-  const syndicateMintResult = await fetch(
-    'https://frame.syndicate.io/api/mint',
-    {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${process.env.SYNDICATE_API_KEY}`,
-      },
-      body: JSON.stringify({
-        frameTrustedData: trustedMessageBytes,
-        args: ['{frame-user}', 1],
-      }),
-    }
-  )
+async function getAddrByFid(fid: number): Promise<string | void> {
+  console.log('Extracting address for FID: ', fid)
 
-  console.log(syndicateMintResult, 'syndicate mint resutlt')
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+    },
+  }
+
+  try {
+    // Searchcaster API
+    const resp = await fetch(
+      `https://searchcaster.xyz/api/profiles?fid=${fid}`,
+      options
+    )
+    if (!resp.ok) {
+      throw new Error('Network response was not ok')
+    }
+    const data = await resp.json()
+
+    // Extract connected address if available, otherwise use address from body
+    const connectedAddress = data[0]?.connectedAddress || data[0]?.body.address
+    console.log('Connected address:', connectedAddress)
+
+    return connectedAddress
+  } catch (error) {
+    return console.error('Error fetching profile data:', error)
+  }
 }
