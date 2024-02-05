@@ -1,4 +1,7 @@
+import { sql } from '@vercel/postgres'
+
 import { syndicate } from './config'
+import { TUntrustedData } from './types'
 
 export const BASE_URL = process.env.BASE_URL
 
@@ -25,6 +28,20 @@ export function generateFarcasterFrame(image: string, isMint?: boolean) {
   `
 }
 
+export async function saveTextInput(ud: TUntrustedData) {
+  const existingFeedback =
+    await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
+  console.log('existingFeedback', existingFeedback)
+
+  if (existingFeedback.rowCount > 0) {
+    console.log('Feedback already submitted by fid:', ud.fid)
+    return generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+  } else {
+    await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${ud.inputText}, false);`
+    return generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+  }
+}
+
 export async function mintWithSyndicate(fid: number) {
   const syndicateMintTx = await syndicate.transact.sendTransaction({
     projectId: 'b344b207-4add-4dbe-bc55-3e4487c0dadc',
@@ -32,7 +49,7 @@ export async function mintWithSyndicate(fid: number) {
     chainId: 84532,
     functionSignature: 'mint(address to)',
     args: {
-      to: getAddrByFid(fid),
+      to: await getAddrByFid(fid),
     },
   })
   console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)

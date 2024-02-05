@@ -1,8 +1,13 @@
 import type { NextApiRequest, NextApiResponse, Metadata } from 'next'
-import { sql } from '@vercel/postgres'
 
-import { BASE_URL, generateFarcasterFrame, mintWithSyndicate } from '@/utils'
+import {
+  BASE_URL,
+  generateFarcasterFrame,
+  mintWithSyndicate,
+  saveTextInput,
+} from '@/utils'
 import { validateMessage } from '@/validate'
+import { TSignedMessage, TUntrustedData } from '@/types'
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,55 +18,29 @@ export default async function handler(
     return
   }
 
-  const signedMessage = req.body as {
-    untrustedData: {
-      fid: number
-      url: string
-      messageHash: string
-      timestamp: number
-      network: number
-      inputText: string
-      buttonIndex: number
-      castId: { fid: number; hash: string }
-    }
-    trustedData?: {
-      messageBytes: string
-    }
-  }
+  const signedMessage = req.body as TSignedMessage
 
   const reqId = req.query.data
-  console.log(reqId, 'wats reqid??')
+  console.log('request query: ', reqId)
 
   const isMessageValid = await validateMessage(
     signedMessage.trustedData?.messageBytes
   )
 
-  console.log('signedMessage', signedMessage)
+  console.log('signedMessage: ', signedMessage)
 
   if (!isMessageValid) {
     return res.status(400).json({ error: 'Invalid message' })
   }
 
-  const ud = signedMessage.untrustedData
-  const textInput = ud.inputText
+  const ud: TUntrustedData = signedMessage.untrustedData
 
   let html: string = ''
 
   switch (reqId) {
     case 'start':
-      if (textInput && textInput.length > 0) {
-        // const existingFeedback =
-        //   await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
-        // console.log('existingFeedback', existingFeedback)
-
-        // if (existingFeedback.rowCount > 0) {
-        //   console.log('Feedback already submitted by fid:', ud.fid)
-        //   html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
-        // } else {
-        //   await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${textInput}, false);`
-        //   html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
-        // }
-
+      if (ud.inputText && ud.inputText.length > 0) {
+        // html = await saveTextInput(ud)
         html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
       } else {
         html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
@@ -70,12 +49,12 @@ export default async function handler(
     case 'mint':
       await mintWithSyndicate(ud.fid)
       break
+    case 'redirect':
+      break
     default:
       html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
       break
   }
-
-  console.log(html, 'wats html?')
 
   return res.status(200).setHeader('Content-Type', 'text/html').send(html)
 }
