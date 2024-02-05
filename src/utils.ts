@@ -1,31 +1,41 @@
 import { sql } from '@vercel/postgres'
 
 import { syndicate } from './config'
-import { TUntrustedData } from './types'
+import { TPostData, TUntrustedData } from './types'
 
 export const BASE_URL = process.env.BASE_URL
 
 // generate an html page with the relevant opengraph tags
-export function generateFarcasterFrame(image: string, isMint?: boolean) {
+export function generateFarcasterFrame(image: string, postData: TPostData) {
+  let metaTags = ''
+
+  switch (postData) {
+    case 'mint':
+      metaTags += `
+		  <meta property="fc:frame:image" content="${image}" />
+		  <meta property="fc:frame:button:1" content="Mint (34 remaining)" />`
+      break
+    case 'redirect':
+      metaTags += `
+		  <meta property="fc:frame:image" content="${image}" />
+		  <meta property="fc:frame:button:1:post_redirect" content="Go to Beta" />`
+      break
+  }
+
+  const postUrl = `${BASE_URL}/api/post?data=${postData}`
+
   return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta property="fc:frame" content="vNext" />
-	  ${
-      isMint &&
-      `<meta property="fc:frame:image" content="${image}" />
-         <meta property="fc:frame:button:1" content="Mint (34 remaining)" />`
-    }
-      <meta property="fc:frame:post_url" content="${BASE_URL}/api/post?data=${
-    isMint ? 'mint' : 'start'
-  }" />
-    </head>
-    <body>
-      
-    </body>
-    </html>
-  `
+	  <!DOCTYPE html>
+	  <html lang="en">
+	  <head>
+		<meta property="fc:frame" content="vNext" />
+		${metaTags}
+		<meta property="fc:frame:post_url" content="${postUrl}" />
+	  </head>
+	  <body>
+	  </body>
+	  </html>
+	`
 }
 
 export async function saveTextInput(ud: TUntrustedData) {
@@ -35,24 +45,25 @@ export async function saveTextInput(ud: TUntrustedData) {
 
   if (existingFeedback.rowCount > 0) {
     console.log('Feedback already submitted by fid:', ud.fid)
-    return generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+    return generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
   } else {
     await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${ud.inputText}, false);`
-    return generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+    return generateFarcasterFrame(`${BASE_URL}/mint.svg`, 'mint')
   }
 }
 
 export async function mintWithSyndicate(fid: number) {
-  const syndicateMintTx = await syndicate.transact.sendTransaction({
-    projectId: 'b344b207-4add-4dbe-bc55-3e4487c0dadc',
-    contractAddress: '0x930A544c651c8a137B60C0505415f3900CC143fc',
-    chainId: 84532,
-    functionSignature: 'mint(address to)',
-    args: {
-      to: await getAddrByFid(fid),
-    },
-  })
-  console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)
+  //   const syndicateMintTx = await syndicate.transact.sendTransaction({
+  //     projectId: 'b344b207-4add-4dbe-bc55-3e4487c0dadc',
+  //     contractAddress: '0x930A544c651c8a137B60C0505415f3900CC143fc',
+  //     chainId: 84532,
+  //     functionSignature: 'mint(address to)',
+  //     args: {
+  //       to: await getAddrByFid(fid),
+  //     },
+  //   })
+  //   console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)
+  return generateFarcasterFrame(`${BASE_URL}/redirect.svg`, 'redirect')
 }
 
 async function getAddrByFid(fid: number): Promise<string | void> {

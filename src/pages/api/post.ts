@@ -36,25 +36,31 @@ export default async function handler(
   const ud: TUntrustedData = signedMessage.untrustedData
 
   let html: string = ''
+  let statusCode: number = 200
+  let locationHeader: string = ''
 
   switch (reqId) {
     case 'start':
       if (ud.inputText && ud.inputText.length > 0) {
         // html = await saveTextInput(ud)
-        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, true)
+        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, 'mint')
       } else {
-        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
       }
       break
     case 'mint':
-      await mintWithSyndicate(ud.fid)
-      break
-    case 'redirect':
+      html = await mintWithSyndicate(ud.fid)
+      statusCode = 302
+      locationHeader = 'https://app.addresso.com/'
       break
     default:
-      html = generateFarcasterFrame(`${BASE_URL}/question.svg`, false)
+      html = generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
       break
   }
 
-  return res.status(200).setHeader('Content-Type', 'text/html').send(html)
+  const response = res.status(statusCode).setHeader('Content-Type', 'text/html')
+  if (locationHeader && statusCode === 302) {
+    response.setHeader('Location', locationHeader)
+  }
+  return response.send(html)
 }

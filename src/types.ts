@@ -24,3 +24,5 @@ export type TUntrustedData = {
   buttonIndex: number
   castId: { fid: number; hash: string }
 }
+
+export type TPostData = 'redirect' | 'mint' | 'start'
