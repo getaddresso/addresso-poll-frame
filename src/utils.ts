@@ -18,7 +18,8 @@ export function generateFarcasterFrame(image: string, postData: TPostData) {
     case 'redirect':
       metaTags += `
 		  <meta property="fc:frame:image" content="${image}" />
-		  <meta property="fc:frame:button:1:post_redirect" content="Go to Beta" />`
+		  <meta property="fc:frame:button:1" content="Go to Beta" />
+		  <meta property="fc:frame:button:1:action" content="post_redirect" />`
       break
   }
 

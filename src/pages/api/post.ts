@@ -38,6 +38,7 @@ export default async function handler(
   let html: string = ''
   let statusCode: number = 200
   let locationHeader: string = ''
+  const response = res.status(statusCode).setHeader('Content-Type', 'text/html')
 
   switch (reqId) {
     case 'start':
@@ -50,17 +51,15 @@ export default async function handler(
       break
     case 'mint':
       html = await mintWithSyndicate(ud.fid)
-      statusCode = 302
-      locationHeader = 'https://app.addresso.com/'
+      break
+    case 'redirect':
+      locationHeader = 'https://app.addresso.com'
+      response.redirect(302, locationHeader) // or you can do Location in response.setHeader()
       break
     default:
       html = generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
       break
   }
 
-  const response = res.status(statusCode).setHeader('Content-Type', 'text/html')
-  if (locationHeader && statusCode === 302) {
-    response.setHeader('Location', locationHeader)
-  }
   return response.send(html)
 }
