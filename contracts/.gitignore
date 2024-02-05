@@ -1,6 +1,8 @@
 # Compiler files
 cache/
 out/
+src/artifacts*
+compiler_config.json
 
 # Ignores development broadcast logs
 !/broadcast

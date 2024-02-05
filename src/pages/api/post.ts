@@ -54,7 +54,11 @@ export default async function handler(
       break
     case 'redirect':
       locationHeader = 'https://app.addresso.com'
-      response.redirect(302, locationHeader) // or you can do Location in response.setHeader()
+      response.redirect(302, locationHeader) // or you set Location in response.setHeader()
+      break
+    case 'error':
+      locationHeader = 'https://warpcast.com/~/channel/addresso'
+      response.redirect(302, locationHeader)
       break
     default:
       html = generateFarcasterFrame(`${BASE_URL}/question.png`, 'start')
