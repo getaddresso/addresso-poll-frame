@@ -46,10 +46,10 @@ export async function saveTextInput(ud: TUntrustedData) {
 
   if (existingFeedback.rowCount > 0) {
     console.log('Feedback already submitted by fid:', ud.fid)
-    return generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
+    return generateFarcasterFrame(`${BASE_URL}/question.png`, 'start')
   } else {
     await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${ud.inputText}, false);`
-    return generateFarcasterFrame(`${BASE_URL}/mint.svg`, 'mint')
+    return generateFarcasterFrame(`${BASE_URL}/mint.png`, 'mint')
   }
 }
 
@@ -64,7 +64,7 @@ export async function mintWithSyndicate(fid: number) {
   //     },
   //   })
   //   console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)
-  return generateFarcasterFrame(`${BASE_URL}/redirect.svg`, 'redirect')
+  return generateFarcasterFrame(`${BASE_URL}/redirect.png`, 'redirect')
 }
 
 async function getAddrByFid(fid: number): Promise<string | void> {

@@ -44,9 +44,9 @@ export default async function handler(
     case 'start':
       if (ud.inputText && ud.inputText.length > 0) {
         // html = await saveTextInput(ud)
-        html = generateFarcasterFrame(`${BASE_URL}/mint.svg`, 'mint')
+        html = generateFarcasterFrame(`${BASE_URL}/mint.png`, 'mint')
       } else {
-        html = generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
+        html = generateFarcasterFrame(`${BASE_URL}/question.png`, 'start')
       }
       break
     case 'mint':
@@ -57,7 +57,7 @@ export default async function handler(
       response.redirect(302, locationHeader) // or you can do Location in response.setHeader()
       break
     default:
-      html = generateFarcasterFrame(`${BASE_URL}/question.svg`, 'start')
+      html = generateFarcasterFrame(`${BASE_URL}/question.png`, 'start')
       break
   }
 
