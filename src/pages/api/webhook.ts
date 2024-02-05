@@ -12,10 +12,16 @@ export default async function handler(
       return
     }
 
-    console.log('req.body', req.body)
     const rawBody = (await buffer(req)).toString()
     const data = JSON.parse(rawBody)
-    const signature = req.headers['x-kc-signature']?.toString() || ''
+    const signatureHeader = req.headers['Syndicate-Signature']?.toString() || ''
+    const pairs = signatureHeader.split(',')
+    const signatureData: Record<string, string> = {}
+    pairs.forEach((pair) => {
+      const [prefix, value] = pair.trim().split('=')
+      signatureData[prefix] = value
+    })
+    const signature = signatureData.s
 
     console.log('WEBHOOK', rawBody, 'data', data, 'signature', signature)
 
