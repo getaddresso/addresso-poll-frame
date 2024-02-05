@@ -14,6 +14,7 @@ export default async function handler(
 
     const rawBody = (await buffer(req)).toString()
     const data = JSON.parse(rawBody)
+
     const signatureHeader = req.headers['Syndicate-Signature']?.toString() || ''
     const pairs = signatureHeader.split(',')
     const signatureData: Record<string, string> = {}
@@ -23,7 +24,7 @@ export default async function handler(
     })
     const signature = signatureData.s
 
-    console.log('WEBHOOK', rawBody, 'data', data, 'signature', signature)
+    console.log('data', data, 'signature', signature)
 
     // Validate the signature
     const isValidSignature = signatureHelper.isValidSignatureFromString(
@@ -37,9 +38,7 @@ export default async function handler(
       return res.status(401).end()
     }
 
-    // Process the webhook payload
     console.log('Valid signature. Processing webhook payload...')
-    // Your webhook processing logic here
 
     res.status(200).end()
   } catch (error) {
