@@ -1,0 +1,12 @@
+{
+  "name": "AddressOG",
+  "description": "Celebrating Addresso at beta.",
+  "external_url": "https://addresso.com",
+  "image": "ipfs://QmcQqzHbqUNWWqik9iv11ebdtrQ8A6YeWPi6ZKhauNfUt4",
+  "attributes": [
+    {
+      "trait_type": "AddressOG",
+      "value": "100%"
+    }
+  ]
+}

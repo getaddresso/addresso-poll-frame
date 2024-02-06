@@ -25,26 +25,26 @@ contract AddressoNFT is ERC721, Ownable {
     event AuthorizedMinterSet(address indexed minter, bool authorized);
 
     modifier onlyAuthorizedMinter() {
-        require(authorizedMinters[msg.sender], "FrameNFTs: Mint must be triggered by API");
+        require(authorizedMinters[msg.sender], "AddressOG: Mint must be triggered by API");
         _;
     }
 
     modifier onlyUnlockedTokenURI(uint256 tokenId) {
-        require(!lockedTokenURIs[tokenId], "FrameNFTs: Token URI is locked");
+        require(!lockedTokenURIs[tokenId], "AddressOG: Token URI is locked");
         _;
     }
 
     modifier onlyBelowMaxMint(address to) {
-        require(mintCount[to] < maxMintPerAddress, "FrameNFTs: Max mint reached");
+        require(mintCount[to] < maxMintPerAddress, "AddressOG: Max mint reached");
         _;
     }
 
     // The deployer is set as the initial owner by default. Make sure to
     // transfer this to a Safe or other multisig for long-term use!
     // You can call `transferOwnership` to do this.
-    constructor() ERC721("AddressoFrameNFT", "ADRSO") Ownable(msg.sender) {
+    constructor() ERC721("AddressOG", "AOG") Ownable(msg.sender) {
         // Update this with your own NFT collection's metadata
-        defaultURI = "ipfs://QmSFqezaUhBKr32Z2vgFrbDPGYdbcj8zQcQvsDqbU6b6UH";
+        defaultURI = "ipfs://Qmf3U6bvvQcUUBkhm7sGvyzSnrikgirDHrT8tJuKB8cdx2";
         maxMintPerAddress = 1;
 
         // The deployer is set as an authorized minter, allowing them to set up
@@ -150,6 +150,6 @@ contract AddressoNFT is ERC721, Ownable {
     // This function ensures that ETH sent directly to the contract by mistake
     // is rejected
     fallback() external payable {
-        revert("FrameNFTs: Does not accept ETH");
+        revert("AddressOG: Does not accept ETH");
     }
 }
