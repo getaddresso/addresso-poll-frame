@@ -43,8 +43,8 @@ export default async function handler(
   switch (reqId) {
     case 'start':
       if (ud.inputText && ud.inputText.length > 0) {
-        // html = await saveTextInput(ud)
-        html = generateFarcasterFrame(`${BASE_URL}/mint.png`, 'mint')
+        html = await saveTextInput(ud)
+        // html = generateFarcasterFrame(`${BASE_URL}/mint.png`, 'mint')
       } else {
         html = generateFarcasterFrame(`${BASE_URL}/question.png`, 'start')
       }

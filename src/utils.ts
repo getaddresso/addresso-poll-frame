@@ -61,7 +61,7 @@ export async function saveTextInput(ud: TUntrustedData) {
 
 export async function mintWithSyndicate(fid: number) {
   const syndicateMintTx = await syndicate.transact.sendTransaction({
-    projectId: '6ebd9b38-1d9a-41af-851d-ba796f882639',
+    projectId: process.env.PROJECT_ID || "",
     contractAddress: '0x930A544c651c8a137B60C0505415f3900CC143fc',
     chainId: 84532,
     functionSignature: 'mint(address to)',
