@@ -4,6 +4,7 @@ import { syndicate } from './config'
 import { TPostData, TUntrustedData } from './types'
 
 export const BASE_URL = process.env.BASE_URL
+export const ROWCOUNT = process.env.ROWCOUNT || 0
 
 // generate an html page with the relevant opengraph tags
 export function generateFarcasterFrame(image: string, postData: TPostData) {
@@ -46,24 +47,29 @@ export function generateFarcasterFrame(image: string, postData: TPostData) {
 }
 
 export async function saveTextInput(ud: TUntrustedData) {
-  const existingFeedback =
-    await sql`SELECT * FROM "Feedback" WHERE Fid = ${ud.fid}`
-  console.log('existingFeedback', existingFeedback)
+  const isMintedAndRowCount =
+    await sql`SELECT COUNT(*) AS rowCount, bool_or(isMinted) AS isMinted
+	FROM "Feedback" 
+	WHERE Fid = ${ud.fid};`
 
-  if (existingFeedback.rowCount > 0) {
-    console.log('Feedback already submitted by fid:', ud.fid)
+  // @dev limit token issuance up to rowcount
+  if (
+    isMintedAndRowCount.rows[0].isminted &&
+    isMintedAndRowCount.rows[0].rowcount <= ROWCOUNT
+  ) {
+    console.log('Fid already minted:', ud.fid)
     return generateFarcasterFrame(`${BASE_URL}/error.png`, 'error')
   } else {
-    await sql`INSERT INTO "Feedback" (Fid, Text, isMinted) VALUES (${ud.fid}, ${ud.inputText}, false);`
+    await sql`INSERT INTO "Feedback" (Fid, Text, Isminted) VALUES (${ud.fid}, ${ud.inputText}, false);`
     return generateFarcasterFrame(`${BASE_URL}/mint.png`, 'mint')
   }
 }
 
 export async function mintWithSyndicate(fid: number) {
   const syndicateMintTx = await syndicate.transact.sendTransaction({
-    projectId: process.env.PROJECT_ID || "",
-    contractAddress: '0x930A544c651c8a137B60C0505415f3900CC143fc',
-    chainId: 84532,
+    projectId: process.env.PROJECT_ID || '',
+    contractAddress: process.env.CONTRACT_ADDRESS || '',
+    chainId: Number(process.env.CHAIN_ID) || 84532,
     functionSignature: 'mint(address to)',
     args: {
       to: await getAddrByFid(fid),
@@ -71,6 +77,7 @@ export async function mintWithSyndicate(fid: number) {
   })
 
   console.log('Syndicate Transaction ID: ', syndicateMintTx.transactionId)
+  await sql`UPDATE "Feedback" SET Isminted = true WHERE Fid = ${fid};`
 
   // @todo loading frame so that nft has time to mint
   return generateFarcasterFrame(`${BASE_URL}/redirect.png`, 'redirect')
