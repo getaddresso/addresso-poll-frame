@@ -5,6 +5,7 @@ import { TPostData, TUntrustedData } from './types'
 
 export const BASE_URL = process.env.BASE_URL
 export const ROWCOUNT = process.env.ROWCOUNT || 0
+export const isCampaignActive = process.env.IS_CAMPAIGN_ACTIVE || true
 
 // generate an html page with the relevant opengraph tags
 export function generateFarcasterFrame(image: string, postData: TPostData) {
@@ -55,7 +56,8 @@ export async function saveTextInput(ud: TUntrustedData) {
   // @dev limit token issuance up to rowcount
   if (
     isMintedAndRowCount.rows[0].isminted &&
-    isMintedAndRowCount.rows[0].rowcount <= ROWCOUNT
+    isMintedAndRowCount.rows[0].rowcount <= ROWCOUNT &&
+    isCampaignActive
   ) {
     console.log('Fid already minted:', ud.fid)
     return generateFarcasterFrame(`${BASE_URL}/error.png`, 'error')
