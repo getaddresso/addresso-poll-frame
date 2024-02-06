@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { buffer } from 'micro'
 import { signatureHelper } from '@kentico/kontent-webhook-helper'
+import { BASE_URL, generateFarcasterFrame } from '@/utils'
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,7 +41,30 @@ export default async function handler(
 
     console.log('Valid signature. Processing webhook payload...')
 
-    res.status(200).end()
+    // @dev WIP because server cannot modify client session
+    /**
+		let frame
+		const status = data.data.status
+		const isSuccess = data.data.status === 'SUBMITTED'
+		const isLoading = data.data.status === 'PENDING' || 'PROCESSED'
+
+		const currentPath = req.url || ''
+		const isOnSamePath = currentPath === ''
+
+
+		switch (status && !isOnSamePath) {
+		case isSuccess:
+			frame = generateFarcasterFrame(`${BASE_URL}/redirect.png`, 'redirect')
+			break
+		case isLoading:
+			frame = generateFarcasterFrame(`${BASE_URL}/loading.png`, 'error')
+			break
+		default:
+			frame = generateFarcasterFrame(`${BASE_URL}/error.png`, 'error')
+		}
+
+		return res.status(200).send(frame)
+	*/
   } catch (error) {
     console.error('Error processing webhook:', error)
     res.status(500).end()

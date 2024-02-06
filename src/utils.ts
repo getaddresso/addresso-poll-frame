@@ -13,7 +13,7 @@ export function generateFarcasterFrame(image: string, postData: TPostData) {
     case 'mint':
       metaTags += `
 		  <meta property="fc:frame:image" content="${image}" />
-		  <meta property="fc:frame:button:1" content="Mint ✨ (34 remaining)" />`
+		  <meta property="fc:frame:button:1" content="Mint AddressOG ✨" />`
       break
     case 'redirect':
       metaTags += `
@@ -24,7 +24,7 @@ export function generateFarcasterFrame(image: string, postData: TPostData) {
     case 'error':
       metaTags += `
 		<meta property="fc:frame:image" content="${image}" />
-		<meta property="fc:frame:button:1" content="Follow /addresso for the next drop" />
+		<meta property="fc:frame:button:1" content="Follow /addresso for the next release" />
 		<meta property="fc:frame:button:1:action" content="post_redirect" />`
       break
   }
